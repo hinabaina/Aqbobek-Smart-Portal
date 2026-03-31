@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Aqbobek Smart Portal - Кабинет{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-5 sm:px-8 py-8 space-y-8">
+    <header class="flex flex-col lg:flex-row justify-between lg:items-end gap-6">
+        <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-3 text-sm">
+                <span class="px-3 py-1 rounded-full bg-white border border-slate-200 text-indigo-700 font-bold">Личный кабинет</span>
+                <span class="text-slate-500">{{ role_label }}</span>
+                <span class="text-slate-500">•</span>
+                <span class="text-slate-500">{{ target.grade }}</span>
+            </div>
+            <div>
+                <h1 class="text-4xl sm:text-5xl font-black font-display tracking-tight">{{ target.full_name }}</h1>
+                <p class="text-slate-500 mt-2">{{ target.login }}</p>
+            </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            {% if user.role == 'teacher' and user.login != target.login %}
+            <a href="{{ url_for('teacher_dashboard') }}" class="px-4 py-3 rounded-2xl bg-white border border-slate-200 font-semibold shadow-sm">Назад к учителю</a>
+            {% else %}
+            <a href="{{ url_for('student_dashboard') }}" class="px-4 py-3 rounded-2xl bg-white border border-slate-200 font-semibold shadow-sm">Назад</a>
+            {% endif %}
+            <a href="{{ url_for('ai_page') }}" class="px-4 py-3 rounded-2xl bg-indigo-600 text-white font-semibold shadow-sm">AI анализ</a>
+        </div>
+    </header>
+
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-5">
+        <div class="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-sm text-slate-500">GPA</div>
+            <div class="text-4xl font-black font-display mt-2">{{ metrics.overall_avg }}</div>
+        </div>
+        <div class="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-sm text-slate-500">Уровень</div>
+            <div class="text-4xl font-black font-display mt-2">{{ metrics.level }}</div>
+        </div>
+        <div class="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-sm text-slate-500">XP</div>
+            <div class="text-4xl font-black font-display mt-2">{{ metrics.xp }}</div>
+        </div>
+        <div class="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-sm text-slate-500">Очки</div>
+            <div class="text-4xl font-black font-display mt-2">{{ metrics.coins }}</div>
+        </div>
+    </section>
+
+    <section class="grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between mb-5">
+                    <h2 class="text-2xl font-black font-display">Общая информация</h2>
+                    <span class="text-sm text-slate-500">{{ target.grade }}</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                        <div class="text-xs uppercase tracking-wider text-slate-500 font-bold">ФИО</div>
+                        <div class="mt-2 text-lg font-bold">{{ target.full_name }}</div>
+                    </div>
+                    <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                        <div class="text-xs uppercase tracking-wider text-slate-500 font-bold">Статус</div>
+                        <div class="mt-2 text-lg font-bold">{{ metrics.title }}</div>
+                    </div>
+                    <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                        <div class="text-xs uppercase tracking-wider text-slate-500 font-bold">Серия</div>
+                        <div class="mt-2 text-lg font-bold">{{ target.streak }} дней</div>
+                    </div>
+                    <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                        <div class="text-xs uppercase tracking-wider text-slate-500 font-bold">Сон</div>
+                        <div class="mt-2 text-lg font-bold">{{ target.sleep_hours }} часов</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between mb-5">
+                    <h2 class="text-2xl font-black font-display">Предметы</h2>
+                    <span class="text-sm text-slate-500">{{ metrics.mastery }}% освоения</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    {% for subject in metrics.subject_rows %}
+                    <div class="rounded-[24px] border border-slate-200 p-5">
+                        <div class="flex justify-between items-center gap-4">
+                            <div>
+                                <div class="font-bold">{{ subject.name }}</div>
+                                <div class="text-xs text-slate-500">{{ subject.theme }}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-black">{{ subject.avg }}</div>
+                                <div class="text-xs text-slate-500">{{ subject.percent }}%</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex gap-2 flex-wrap">
+                            {% for mark in subject.marks %}
+                            <span class="w-9 h-9 rounded-xl flex items-center justify-center font-bold {% if mark == 5 %}bg-indigo-600 text-white{% elif mark == 4 %}bg-slate-100{% elif mark == 3 %}bg-amber-100 text-amber-700{% else %}bg-rose-100 text-rose-700{% endif %}">{{ mark }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-black font-display mb-4">Родители</h2>
+                <div class="space-y-3">
+                    {% for parent in target.parents %}
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                        <div class="font-bold">{{ parent.relation }}: {{ parent.name }}</div>
+                        <div class="text-sm text-slate-500 mt-1">{{ parent.phone }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-black font-display mb-4">Геймификация</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                        <div class="text-xs text-slate-500">XP</div>
+                        <div class="text-3xl font-black mt-1">{{ metrics.xp }}</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                        <div class="text-xs text-slate-500">Очки</div>
+                        <div class="text-3xl font-black mt-1">{{ metrics.coins }}</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                        <div class="text-xs text-slate-500">До уровня</div>
+                        <div class="text-3xl font-black mt-1">{{ metrics.to_next }}</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                        <div class="text-xs text-slate-500">Риск</div>
+                        <div class="text-3xl font-black mt-1">{{ metrics.risk }}%</div>
+                    </div>
+                </div>
+                <div class="mt-4 h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-indigo-600 rounded-full" style="width: {{ (metrics.progress / 250 * 100) | round(1) }}%"></div>
+                </div>
+                <div class="mt-2 text-xs text-slate-500">{{ metrics.progress }}/250 до следующего уровня</div>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    {% for badge in metrics.badges %}
+                    <span class="px-3 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold">{{ badge }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-black font-display mb-4">Доп. уроки</h2>
+                <div class="space-y-3">
+                    {% if target.extra_lessons %}
+                        {% for lesson in target.extra_lessons %}
+                        <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                            <div class="font-bold">{{ lesson.subject }}</div>
+                            <div class="text-sm text-slate-600 mt-1">{{ lesson.title }}</div>
+                            <div class="text-xs text-slate-500 mt-1">{{ lesson.created_at }} · {{ lesson.from_teacher }}</div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-sm text-slate-500">Пока нет дополнительных уроков.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-black font-display mb-4">Уведомления</h2>
+                <div class="space-y-3">
+                    {% if target.notifications %}
+                        {% for note in target.notifications[:5] %}
+                        <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                            <div class="text-sm">{{ note.text }}</div>
+                            <div class="text-xs text-slate-500 mt-1">{{ note.created_at }}</div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-sm text-slate-500">Пока без уведомлений.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

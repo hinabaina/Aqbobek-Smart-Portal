@@ -1,0 +1,164 @@
+
+{% extends "base.html" %}
+{% block title %}Aqbobek Smart Portal - Kiosk{% endblock %}
+{% block body_class %}bg-[#0b0f19] text-white{% endblock %}
+{% block content %}
+<div class="min-h-screen p-6 sm:p-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+    <div class="max-w-7xl mx-auto space-y-8">
+        <header class="flex flex-col lg:flex-row justify-between gap-6 lg:items-center border-b border-slate-800 pb-6">
+            <div class="flex items-center gap-5">
+                <div class="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-4xl">school</span>
+                </div>
+                <div>
+                    <h1 class="text-5xl sm:text-6xl font-black font-display tracking-tight">AQBOBEK <span class="text-indigo-500">SMART</span></h1>
+                    <div class="text-slate-400 mt-2 text-lg">{{ user.full_name }} · kiosk mode</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="/teacher" class="px-4 py-3 rounded-2xl border border-slate-700 text-slate-200 hover:bg-slate-800 transition">Учительская</a>
+                <a href="/logout" class="px-4 py-3 rounded-2xl bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition">Выход</a>
+                <div class="text-5xl sm:text-7xl font-black font-display tracking-tighter text-slate-200" id="clock">12:00</div>
+            </div>
+        </header>
+
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="rounded-[32px] bg-slate-900/90 border border-slate-800 p-6">
+                <div class="text-slate-400 text-sm">Средний балл</div>
+                <div class="text-4xl font-black font-display mt-2">{{ class_metrics.class_avg }}</div>
+            </div>
+            <div class="rounded-[32px] bg-slate-900/90 border border-slate-800 p-6">
+                <div class="text-slate-400 text-sm">Слабых тем</div>
+                <div class="text-4xl font-black font-display mt-2">{{ class_metrics.weak_subjects|length }}</div>
+            </div>
+            <div class="rounded-[32px] bg-slate-900/90 border border-slate-800 p-6">
+                <div class="text-slate-400 text-sm">Ученики в риске</div>
+                <div class="text-4xl font-black font-display mt-2">{{ class_metrics.risk_students|length }}</div>
+            </div>
+            <div class="rounded-[32px] bg-slate-900/90 border border-slate-800 p-6">
+                <div class="text-slate-400 text-sm">Обратный отчет</div>
+                <div class="text-3xl font-black font-display mt-3" id="countdown">{{ countdown.days }}д {{ countdown.hours }}ч {{ countdown.minutes }}м {{ countdown.seconds }}с</div>
+            </div>
+        </section>
+
+        <section class="grid xl:grid-cols-3 gap-6">
+            <div class="xl:col-span-2 space-y-6">
+                <div class="rounded-[40px] bg-gradient-to-br from-indigo-900 to-[#0b0f19] p-8 border border-indigo-800/60">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="material-symbols-outlined text-4xl text-yellow-400">campaign</span>
+                        <h2 class="text-3xl font-black font-display">Объявления</h2>
+                    </div>
+                    <div class="grid gap-4">
+                        {% for item in announcements %}
+                        <div class="rounded-[28px] bg-white/5 border border-white/10 p-5">
+                            <div class="text-sm text-indigo-200">{{ item.title }}</div>
+                            <div class="text-2xl font-bold mt-2">{{ item.text }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="rounded-[40px] bg-slate-900/90 border border-slate-800 p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-3xl font-black font-display">Топ ученики</h2>
+                        <span class="text-slate-400">по среднему баллу</span>
+                    </div>
+                    <div class="grid lg:grid-cols-2 gap-4">
+                        {% for item in class_metrics.top_students %}
+                        <div class="rounded-[28px] bg-slate-800 border border-slate-700 p-5 flex justify-between items-center gap-4">
+                            <div>
+                                <div class="text-2xl font-bold">{{ item[0].full_name }}</div>
+                                <div class="text-slate-400 text-sm">{{ item[0].grade }} · XP {{ item[1].xp }}</div>
+                            </div>
+                            <div class="text-4xl font-black text-indigo-400">{{ item[1].overall_avg }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="rounded-[40px] bg-slate-900/90 border border-slate-800 p-8">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="material-symbols-outlined text-4xl text-indigo-400">warning</span>
+                        <h2 class="text-3xl font-black font-display">Ученики в риске</h2>
+                    </div>
+                    <div class="space-y-4">
+                        {% for item in class_metrics.risk_students %}
+                        <div class="rounded-3xl bg-rose-950/50 border border-rose-800 p-5">
+                            <div class="text-2xl font-bold">{{ item[0].full_name }}</div>
+                            <div class="text-slate-300 mt-1">Риск {{ item[1].risk }}% · GPA {{ item[1].overall_avg }}</div>
+                            <div class="text-slate-400 text-sm mt-2">Лучше назначить доп. занятие и короткое закрепление.</div>
+                        </div>
+                        {% endfor %}
+                        {% if not class_metrics.risk_students %}
+                        <div class="text-slate-400">Рисковых учеников нет.</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="rounded-[40px] bg-slate-900/90 border border-slate-800 p-8">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="material-symbols-outlined text-4xl text-emerald-400">auto_stories</span>
+                        <h2 class="text-3xl font-black font-display">Слабые темы</h2>
+                    </div>
+                    <div class="space-y-3">
+                        {% for subject in class_metrics.weak_subjects %}
+                        <div class="rounded-2xl bg-slate-800 border border-slate-700 p-4 flex justify-between">
+                            <span class="font-bold">{{ subject }}</span>
+                            <span class="text-slate-400">{{ class_metrics.subject_avgs[subject] }}</span>
+                        </div>
+                        {% endfor %}
+                        {% if not class_metrics.weak_subjects %}
+                        <div class="text-slate-400">Слабых тем не найдено.</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="rounded-[40px] bg-slate-900/90 border border-slate-800 p-8">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="material-symbols-outlined text-4xl text-yellow-400">assignment</span>
+                        <h2 class="text-3xl font-black font-display">Готовая домашка</h2>
+                    </div>
+                    <div class="space-y-3">
+                        {% for item in homework_queue %}
+                        <div class="rounded-2xl bg-slate-800 border border-slate-700 p-4">
+                            <div class="text-indigo-300 text-sm font-bold">{{ item.subject }}</div>
+                            <div class="mt-1">{{ item.title }}</div>
+                        </div>
+                        {% endfor %}
+                        {% if not homework_queue %}
+                        <div class="text-slate-400">Пока нет сгенерированных заданий.</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function updateClock() {
+    const date = new Date()
+    document.getElementById('clock').innerText = date.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'})
+}
+function updateCountdown() {
+    const target = new Date("{{ countdown.iso }}")
+    const now = new Date()
+    let diff = Math.max(0, target - now)
+    const days = Math.floor(diff / 86400000)
+    diff %= 86400000
+    const hours = Math.floor(diff / 3600000)
+    diff %= 3600000
+    const minutes = Math.floor(diff / 60000)
+    diff %= 60000
+    const seconds = Math.floor(diff / 1000)
+    document.getElementById('countdown').innerText = `${days}д ${hours}ч ${minutes}м ${seconds}с`
+}
+updateClock()
+updateCountdown()
+setInterval(updateClock, 1000)
+setInterval(updateCountdown, 1000)
+</script>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block title %}Aqbobek Smart Portal - Ученику{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-5 sm:px-8 py-8 space-y-8">
+    <section class="flex flex-col lg:flex-row justify-between gap-6 lg:items-end">
+        <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-3 text-sm">
+                <span class="px-3 py-1 rounded-full bg-white border border-slate-200 text-indigo-700 font-bold">Личный кабинет</span>
+                <span class="text-slate-500">{{ user.grade }}</span>
+                <span class="text-slate-500">•</span>
+                <span class="text-slate-500">Ученик</span>
+            </div>
+            <div>
+                <h1 class="text-4xl sm:text-5xl font-black font-display tracking-tight">Привет, {{ user.full_name }}</h1>
+                <p class="text-slate-500 mt-2">Баланс обучения, геймификация и AI-подсказки</p>
+            </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="{{ url_for('cabinet') }}" class="px-4 py-3 rounded-2xl bg-white border border-slate-200 font-semibold shadow-sm">Кабинет</a>
+            <a href="{{ url_for('ai_page') }}" class="px-4 py-3 rounded-2xl bg-indigo-600 text-white font-semibold shadow-sm">AI анализ</a>
+            <a href="{{ url_for('logout') }}" class="px-4 py-3 rounded-2xl bg-slate-900 text-white font-semibold shadow-sm">Выход</a>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-5">
+        <div class="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-sm text-slate-500">GPA</div>
+            <div class="text-4xl font-black font-display mt-2">{{ metrics.overall_avg }}</div>
+        </div>
+        <div class="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-sm text-slate-500">Уровень</div>
+            <div class="text-4xl font-black font-display mt-2">{{ metrics.level }}</div>
+        </div>
+        <div class="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-sm text-slate-500">XP</div>
+            <div class="text-4xl font-black font-display mt-2">{{ metrics.xp }}</div>
+        </div>
+        <div class="rounded-[28px] bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-sm text-slate-500">Очки</div>
+            <div class="text-4xl font-black font-display mt-2">{{ metrics.coins }}</div>
+        </div>
+    </section>
+
+    <section class="grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="rounded-[32px] bg-gradient-to-br from-indigo-600 to-indigo-950 text-white p-7 shadow-lg">
+                <div class="flex items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="text-2xl font-black font-display">ИИ-аналитика</h2>
+                        <p class="text-indigo-100 text-sm mt-1">Персональные подсказки по обучению</p>
+                    </div>
+                    <div class="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">
+                        {{ metrics.risk }}% риск
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    {% for alert in alerts %}
+                    <div class="rounded-2xl border border-white/15 bg-white/10 p-4">
+                        <div class="font-bold">{{ alert.title }}</div>
+                        <div class="text-sm text-indigo-100 mt-1">{{ alert.text }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between mb-5">
+                    <h2 class="text-2xl font-black font-display">Предметы</h2>
+                    <span class="text-sm text-slate-500">{{ metrics.mastery }}% освоения</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    {% for subject in metrics.subject_rows %}
+                    <div class="rounded-[24px] border border-slate-200 p-5">
+                        <div class="flex justify-between items-center gap-4">
+                            <div>
+                                <div class="font-bold">{{ subject.name }}</div>
+                                <div class="text-xs text-slate-500">Тема: {{ subject.theme }}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-black">{{ subject.avg }}</div>
+                                <div class="text-xs text-slate-500">{{ subject.percent }}%</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex gap-2 flex-wrap">
+                            {% for mark in subject.marks %}
+                            <span class="w-9 h-9 rounded-xl flex items-center justify-center font-bold {% if mark == 5 %}bg-indigo-600 text-white{% elif mark == 4 %}bg-slate-100{% elif mark == 3 %}bg-amber-100 text-amber-700{% else %}bg-rose-100 text-rose-700{% endif %}">{{ mark }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between mb-5">
+                    <h2 class="text-2xl font-black font-display">Домашние задания</h2>
+                    <span class="text-sm text-slate-500">{{ metrics.completed_homework }} выполнено</span>
+                </div>
+                <div class="space-y-4">
+                    {% for item in user.homework %}
+                    <div class="rounded-2xl border border-slate-200 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <div class="font-bold">{{ item.subject }}</div>
+                            <div class="text-sm text-slate-600 mt-1">{{ item.title }}</div>
+                            <div class="text-xs text-slate-500 mt-1">{{ item.created_at }} · {{ item.from_teacher }}</div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm px-3 py-1 rounded-full {% if item.status == 'done' %}bg-emerald-100 text-emerald-700{% else %}bg-slate-100 text-slate-600{% endif %}">{{ item.status }}</span>
+                            {% if item.status != 'done' %}
+                            <form method="post" action="{{ url_for('complete_homework') }}">
+                                <input type="hidden" name="subject" value="{{ item.subject }}">
+                                <input type="hidden" name="title" value="{{ item.title }}">
+                                <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Выполнено</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-sm text-slate-500">Пока нет заданий.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-black font-display mb-4">Прогресс</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                        <div class="text-xs text-slate-500">XP</div>
+                        <div class="text-3xl font-black mt-1">{{ metrics.xp }}</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                        <div class="text-xs text-slate-500">Очки</div>
+                        <div class="text-3xl font-black mt-1">{{ metrics.coins }}</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                        <div class="text-xs text-slate-500">Серия</div>
+                        <div class="text-3xl font-black mt-1">{{ user.streak }}</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+                        <div class="text-xs text-slate-500">Риск</div>
+                        <div class="text-3xl font-black mt-1">{{ metrics.risk }}%</div>
+                    </div>
+                </div>
+                <div class="mt-4 h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-indigo-600 rounded-full" style="width: {{ (metrics.progress / 250 * 100) | round(1) }}%"></div>
+                </div>
+                <div class="mt-2 text-xs text-slate-500">{{ metrics.progress }}/250 до следующего уровня</div>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    {% for badge in metrics.badges %}
+                    <span class="px-3 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold">{{ badge }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-black font-display mb-4">Лидерборд</h2>
+                <div class="space-y-3">
+                    {% for row in leaderboard %}
+                    <div class="rounded-2xl border border-slate-200 p-4 flex items-center justify-between">
+                        <div>
+                            <div class="font-bold">{{ row[0].full_name }}</div>
+                            <div class="text-xs text-slate-500">{{ row[0].grade }}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-black">{{ row[1].overall_avg }}</div>
+                            <div class="text-xs text-slate-500">GPA</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-black font-display mb-4">Ближайшее событие</h2>
+                <div class="rounded-2xl bg-slate-900 text-white p-5">
+                    <div class="text-sm text-slate-300">{{ user.event_title }}</div>
+                    <div class="text-3xl font-black font-display mt-2" id="countdown">{{ countdown.days }}д {{ countdown.hours }}ч {{ countdown.minutes }}м {{ countdown.seconds }}с</div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    const target = new Date("{{ countdown.iso }}");
+    const countdownElement = document.getElementById("countdown");
+    function tick() {
+        const now = new Date();
+        let diff = Math.max(0, target - now);
+        const days = Math.floor(diff / 86400000);
+        diff %= 86400000;
+        const hours = Math.floor(diff / 3600000);
+        diff %= 3600000;
+        const minutes = Math.floor(diff / 60000);
+        diff %= 60000;
+        const seconds = Math.floor(diff / 1000);
+        countdownElement.innerText = `${days}д ${hours}ч ${minutes}м ${seconds}с`;
+    }
+    tick();
+    setInterval(tick, 1000);
+</script>
+{% endblock %}

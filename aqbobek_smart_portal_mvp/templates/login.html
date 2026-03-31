@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Aqbobek Smart Portal - Вход{% endblock %}
+{% block body_class %}bg-slate-950 text-white{% endblock %}
+{% block content %}
+<div class="min-h-[calc(100vh-73px)] grid lg:grid-cols-2">
+    <div class="hidden lg:flex flex-col justify-between p-12 bg-gradient-to-br from-indigo-700 via-indigo-900 to-slate-950">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center text-2xl font-black font-display">AL</div>
+            <div>
+                <div class="text-4xl font-black font-display tracking-tight">AQBOBEK SMART</div>
+                <div class="text-indigo-200">Unified school portal</div>
+            </div>
+        </div>
+        <div class="max-w-xl space-y-6">
+            <div class="text-5xl font-black font-display leading-tight">Ученики, учителя и AI в одном месте</div>
+            <p class="text-lg text-indigo-100 leading-relaxed">Личный кабинет, дневник, оценки, геймификация, доп. задания, kiosk mode и аналитика риска — всё в одном рабочем MVP.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4 text-sm text-indigo-100">
+            <div class="rounded-3xl border border-white/10 bg-white/5 p-4">
+                <div class="font-bold">Учитель</div>
+                <div class="opacity-80">teacher.aqbobek / Teach2026!</div>
+            </div>
+            <div class="rounded-3xl border border-white/10 bg-white/5 p-4">
+                <div class="font-bold">Алихан</div>
+                <div class="opacity-80">alikhan.sagyndykov / Aqbo2026!</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex items-center justify-center p-6 lg:p-10 bg-slate-900">
+        <div class="w-full max-w-2xl space-y-6">
+            <div class="grid gap-6 lg:grid-cols-2">
+                <form method="post" action="{{ url_for('login') }}" class="rounded-[28px] bg-white/5 border border-white/10 p-6 backdrop-blur">
+                    <h2 class="text-2xl font-black font-display mb-2">Вход</h2>
+                    <p class="text-sm text-slate-300 mb-6">Для уже созданного аккаунта</p>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm mb-2 text-slate-300">Логин</label>
+                            <input name="login" class="w-full rounded-2xl bg-slate-950 border border-slate-700 px-4 py-3 outline-none focus:border-indigo-500" placeholder="teacher.aqbobek" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-2 text-slate-300">Пароль</label>
+                            <input name="password" type="password" class="w-full rounded-2xl bg-slate-950 border border-slate-700 px-4 py-3 outline-none focus:border-indigo-500" placeholder="••••••••" required>
+                        </div>
+                        <button class="w-full rounded-2xl bg-indigo-600 py-3 font-bold hover:bg-indigo-500 transition">Войти</button>
+                    </div>
+                </form>
+
+                <form method="post" action="{{ url_for('register') }}" class="rounded-[28px] bg-white/5 border border-white/10 p-6 backdrop-blur">
+                    <h2 class="text-2xl font-black font-display mb-2">Регистрация ученика</h2>
+                    <p class="text-sm text-slate-300 mb-6">Создаётся новый учебный профиль</p>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm mb-2 text-slate-300">Имя</label>
+                                <input name="first_name" class="w-full rounded-2xl bg-slate-950 border border-slate-700 px-4 py-3 outline-none focus:border-indigo-500" placeholder="Имя" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm mb-2 text-slate-300">Фамилия</label>
+                                <input name="last_name" class="w-full rounded-2xl bg-slate-950 border border-slate-700 px-4 py-3 outline-none focus:border-indigo-500" placeholder="Фамилия" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm mb-2 text-slate-300">Класс</label>
+                                <input name="grade" class="w-full rounded-2xl bg-slate-950 border border-slate-700 px-4 py-3 outline-none focus:border-indigo-500" placeholder="10 А" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm mb-2 text-slate-300">Пароль</label>
+                                <input name="password" type="password" class="w-full rounded-2xl bg-slate-950 border border-slate-700 px-4 py-3 outline-none focus:border-indigo-500" placeholder="Пароль" required>
+                            </div>
+                        </div>
+                        <button class="w-full rounded-2xl bg-white text-slate-950 py-3 font-bold hover:bg-slate-200 transition">Создать аккаунт</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="rounded-[28px] bg-white/5 border border-white/10 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-black font-display">Демо-аккаунты</h3>
+                    <a href="{{ url_for('kiosk') }}" class="text-indigo-300 hover:text-indigo-200 text-sm">Kiosk mode</a>
+                </div>
+                <div class="grid sm:grid-cols-3 gap-4 text-sm">
+                    <div class="rounded-2xl bg-slate-950/80 border border-slate-800 p-4">
+                        <div class="font-bold">Учитель</div>
+                        <div class="text-slate-400 mt-1">teacher.aqbobek</div>
+                        <div class="text-slate-400">Teach2026!</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-950/80 border border-slate-800 p-4">
+                        <div class="font-bold">Алихан</div>
+                        <div class="text-slate-400 mt-1">alikhan.sagyndykov</div>
+                        <div class="text-slate-400">Aqbo2026!</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-950/80 border border-slate-800 p-4">
+                        <div class="font-bold">Нурсая</div>
+                        <div class="text-slate-400 mt-1">nursaya.ashimova</div>
+                        <div class="text-slate-400">Nursa2026!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

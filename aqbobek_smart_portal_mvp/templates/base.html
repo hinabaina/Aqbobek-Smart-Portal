@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Aqbobek Smart Portal{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Manrope', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="{% block body_class %}bg-slate-50 text-slate-900{% endblock %} font-sans">
+    <div class="min-h-screen">
+        <header class="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between gap-4">
+                <a href="/" class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-black font-display">AL</div>
+                    <div>
+                        <div class="font-black font-display tracking-tight">AQBOBEK SMART</div>
+                        <div class="text-xs text-slate-500">Unified school portal</div>
+                    </div>
+                </a>
+
+                <nav class="flex items-center gap-2 sm:gap-3 flex-wrap">
+                    {% if user %}
+                        {% if user.role == 'student' %}
+                        <a href="{{ url_for('student_dashboard') }}" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-semibold">Главная</a>
+                        <a href="{{ url_for('cabinet') }}" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold">Кабинет</a>
+                        <a href="{{ url_for('ai_page') }}" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold">AI</a>
+                        {% else %}
+                        <a href="{{ url_for('teacher_dashboard') }}" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-semibold">Панель учителя</a>
+                        <a href="{{ url_for('kiosk') }}" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold">Kiosk</a>
+                        <a href="{{ url_for('ai_page') }}" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold">AI</a>
+                        {% endif %}
+                        <a href="{{ url_for('logout') }}" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Выход</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-semibold">Вход</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <div class="max-w-7xl mx-auto px-5 sm:px-8 pt-6 space-y-3">
+                    {% for message in messages %}
+                    <div class="rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-900 px-4 py-3">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

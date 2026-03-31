@@ -1,0 +1,140 @@
+
+{% extends "base.html" %}
+{% block title %}Aqbobek Smart Portal - AI{% endblock %}
+{% block body_class %}bg-slate-50 text-slate-900{% endblock %}
+{% block content %}
+<div class="min-h-screen">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-8 space-y-8">
+        <header class="flex flex-col lg:flex-row justify-between lg:items-end gap-6">
+            <div class="space-y-3">
+                <div class="flex flex-wrap items-center gap-3 text-sm">
+                    <span class="px-3 py-1 rounded-full bg-white border border-slate-200 text-indigo-700 font-bold">AI Mentor</span>
+                    <span class="text-slate-500">{{ user.full_name }}</span>
+                </div>
+                <div>
+                    <h1 class="text-4xl sm:text-5xl font-black font-display tracking-tight">Аналитика и рекомендации</h1>
+                    <p class="text-slate-500 mt-2">Подсказки меняются по роли: ученик или учитель.</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                {% if user.role == 'teacher' %}
+                <a href="/teacher" class="px-4 py-3 rounded-2xl bg-white border border-slate-200 font-semibold shadow-sm">К учителю</a>
+                <a href="/kiosk" class="px-4 py-3 rounded-2xl bg-slate-900 text-white font-semibold shadow-sm">Kiosk</a>
+                {% else %}
+                <a href="/student" class="px-4 py-3 rounded-2xl bg-white border border-slate-200 font-semibold shadow-sm">К ученику</a>
+                <a href="/cabinet/{{ user.login }}" class="px-4 py-3 rounded-2xl bg-slate-900 text-white font-semibold shadow-sm">Кабинет</a>
+                {% endif %}
+            </div>
+        </header>
+
+        {% if role == 'student' %}
+        <section class="grid md:grid-cols-4 gap-5">
+            <div class="rounded-[28px] bg-white p-6 border border-slate-200 shadow-sm">
+                <div class="text-sm text-slate-500">GPA</div>
+                <div class="text-4xl font-black font-display mt-2">{{ metrics.overall_avg }}</div>
+            </div>
+            <div class="rounded-[28px] bg-white p-6 border border-slate-200 shadow-sm">
+                <div class="text-sm text-slate-500">Риск</div>
+                <div class="text-4xl font-black font-display mt-2">{{ metrics.risk }}%</div>
+            </div>
+            <div class="rounded-[28px] bg-white p-6 border border-slate-200 shadow-sm">
+                <div class="text-sm text-slate-500">XP</div>
+                <div class="text-4xl font-black font-display mt-2">{{ metrics.xp }}</div>
+            </div>
+            <div class="rounded-[28px] bg-white p-6 border border-slate-200 shadow-sm">
+                <div class="text-sm text-slate-500">Очки</div>
+                <div class="text-4xl font-black font-display mt-2">{{ metrics.coins }}</div>
+            </div>
+        </section>
+
+        <section class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+            <h2 class="text-2xl font-black font-display mb-5">Подсказки для ученика</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                {% for item in insights %}
+                <div class="rounded-3xl p-5 border {% if item.type == 'danger' %}border-rose-200 bg-rose-50{% elif item.type == 'warning' %}border-amber-200 bg-amber-50{% elif item.type == 'success' %}border-emerald-200 bg-emerald-50{% else %}border-slate-200 bg-slate-50{% endif %}">
+                    <div class="font-bold">{{ item.title }}</div>
+                    <div class="text-sm mt-2 text-slate-600">{{ item.text }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+            <h2 class="text-2xl font-black font-display mb-5">Что даст быстрый рост</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                {% for subject in metrics.subject_rows[:4] %}
+                <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                    <div class="font-bold">{{ subject.name }}</div>
+                    <div class="text-sm text-slate-600 mt-1">Текущий балл: {{ subject.avg }}</div>
+                    <div class="text-sm text-slate-600">Освоение: {{ subject.percent }}%</div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% else %}
+        <section class="grid md:grid-cols-4 gap-5">
+            <div class="rounded-[28px] bg-white p-6 border border-slate-200 shadow-sm">
+                <div class="text-sm text-slate-500">Средний балл</div>
+                <div class="text-4xl font-black font-display mt-2">{{ class_metrics.class_avg }}</div>
+            </div>
+            <div class="rounded-[28px] bg-white p-6 border border-slate-200 shadow-sm">
+                <div class="text-sm text-slate-500">Слабых тем</div>
+                <div class="text-4xl font-black font-display mt-2">{{ class_metrics.weak_subjects|length }}</div>
+            </div>
+            <div class="rounded-[28px] bg-white p-6 border border-slate-200 shadow-sm">
+                <div class="text-sm text-slate-500">Риск-учеников</div>
+                <div class="text-4xl font-black font-display mt-2">{{ class_metrics.risk_students|length }}</div>
+            </div>
+            <div class="rounded-[28px] bg-white p-6 border border-slate-200 shadow-sm">
+                <div class="text-sm text-slate-500">Топ-5</div>
+                <div class="text-4xl font-black font-display mt-2">{{ class_metrics.top_students|length }}</div>
+            </div>
+        </section>
+
+        <section class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+            <h2 class="text-2xl font-black font-display mb-5">Подсказки для учителя</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                {% for item in insights %}
+                <div class="rounded-3xl p-5 border {% if item.type == 'danger' %}border-rose-200 bg-rose-50{% elif item.type == 'warning' %}border-amber-200 bg-amber-50{% else %}border-emerald-200 bg-emerald-50{% endif %}">
+                    <div class="font-bold">{{ item.title }}</div>
+                    <div class="text-sm mt-2 text-slate-600">{{ item.text }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="grid lg:grid-cols-2 gap-6">
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-black font-display mb-4">Слабые предметы класса</h2>
+                <div class="space-y-3">
+                    {% for subject in class_metrics.weak_subjects %}
+                    <div class="rounded-2xl bg-amber-50 border border-amber-200 p-4 flex justify-between">
+                        <span class="font-bold">{{ subject }}</span>
+                        <span class="text-slate-500">{{ class_metrics.subject_avgs[subject] }}</span>
+                    </div>
+                    {% endfor %}
+                    {% if not class_metrics.weak_subjects %}
+                    <div class="text-sm text-slate-500">Класс пока справляется без сильных провалов.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="rounded-[32px] bg-white p-7 border border-slate-200 shadow-sm">
+                <h2 class="text-2xl font-black font-display mb-4">Ученики в риске</h2>
+                <div class="space-y-3">
+                    {% for item in class_metrics.risk_students %}
+                    <div class="rounded-2xl bg-rose-50 border border-rose-200 p-4">
+                        <div class="font-bold">{{ item[0].full_name }}</div>
+                        <div class="text-sm text-slate-600 mt-1">Риск {{ item[1].risk }}% · GPA {{ item[1].overall_avg }}</div>
+                    </div>
+                    {% endfor %}
+                    {% if not class_metrics.risk_students %}
+                    <div class="text-sm text-slate-500">Ученики в зоне риска не найдены.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
